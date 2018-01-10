@@ -1,0 +1,17 @@
+heapster:
+  rbac:
+    create: true
+kube-state-metrics:
+  rbac:
+    create: true
+nginx-ingress:
+  controller:
+    service:
+      type: NodePort
+      nodePorts:
+        http: 32080
+        https: 32443
+    stats:
+      enabled: true
+  rbac:
+    create: true

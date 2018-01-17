@@ -1,0 +1,15 @@
+concourse:
+  #insecureDockerRegistry: "build-docker-registry:5000"
+  web:
+    replicas: 1
+    ingress:
+      enabled: true
+      hosts:
+      - concourse.cool.haus
+  worker:
+    replicas: 3
+  persistence:
+    enabled: false  
+  postgresql:
+    persistence:
+      enabled: false

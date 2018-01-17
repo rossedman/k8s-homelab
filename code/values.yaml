@@ -1,0 +1,23 @@
+docker-registry:
+  ingress:
+    enabled: true
+    hosts:
+    - registry.cool.haus
+    annotations:
+      ingress.kubernetes.io/proxy-body-size: 2000m
+gogs:
+  service:
+    sshDomain: git.cool.haus
+    gogs:
+      appName: "coolhaus"
+      serverDomain: git.cool.haus
+      serverRootUrl: http://git.cool.haus/
+    ingress:
+      enabled: true
+      hosts:
+      - git.cool.haus
+  persistence:
+    enabled: false
+  postgresql:
+    persistence:
+      enabled: false

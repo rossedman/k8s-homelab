@@ -1,5 +1,10 @@
 nginx-ingress:
   controller:
+    kind: DaemonSet
+    updateStrategy:
+      rollingUpdate:
+        maxUnavailable: 1
+      type: RollingUpdate
     service:
       type: NodePort
       nodePorts:

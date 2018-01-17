@@ -1,0 +1,9 @@
+dependencies:
+- name: docker-registry
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 1.0.1
+- name: gogs
+  repository: https://kubernetes-charts-incubator.storage.googleapis.com
+  version: 0.5.1
+digest: sha256:b60f6127511170ef069a5822f397b01750062684fd97ab7ba9f5d9d0483884dc
+generated: 2018-01-16T20:48:32.081608352-06:00

@@ -1,0 +1,7 @@
+apiVersion: v1
+description: Umbrella chart for configuring at home cluster
+name: ingress
+version: 0.1.0
+maintainers:
+- name: Ross Edman
+  email: ross.edman@gmail.com

@@ -11,12 +11,12 @@ kubectl create -f ./helm/tiller-rbac.yaml && \
 
 ### Installing Configuration
 ```
-helm dependency build ./core
-helm install -n core --namespace core ./core
+helm dependency build ./metrics
+helm install -n metrics --namespace metrics ./metrics
 ```
 
 ### Upgrading Deployment
 ```
-helm dependency update ./core
-helm upgrade core ./core --namespace core
+helm dependency update ./metrics
+helm upgrade metrics ./metrics --namespace metrics
 ```

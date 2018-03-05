@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: memcached
+  namespace: kube-system
 spec:
   # The memcache client uses DNS to get a list of memcached servers and then
   # uses a consistent hash of the key to determine which server to pick.

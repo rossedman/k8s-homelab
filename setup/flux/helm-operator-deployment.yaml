@@ -16,6 +16,7 @@
   kind: Deployment
   metadata:
     name: helm-operator
+    namespace: kube-system
   spec:
     replicas: 1
     strategy:

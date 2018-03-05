@@ -85,7 +85,11 @@ kubectl taint nodes --all node-role.kubernetes.io/master
 kubectl label node/k8s-nuc1 kubernetes.io/role=worker
 kubectl label node/k8s-nuc2 kubernetes.io/role=worker
 kubectl label node/k8s-nuc3 kubernetes.io/role=worker
-helm init
+```
+
+```
+kubectl create -f ./setup/tiller-rbac.yaml && \
+  helm init --service-account tiller
 ```
 
 ---
@@ -105,4 +109,15 @@ Setup rook cluster, storage class and agent permissions
 kubectl apply -f setup/storage/rook-cluster.yml
 kubectl apply -f setup/storage/rook-storageclass.yml
 kubectl apply -f setup/storage/rook-agent.yml
+```
+
+---
+
+## FLUX
+
+Setup flux and begin bootstrapping cluster configurations and deployments from git
+
+```
+kubectl apply -f setup/flux/flux-deployment.yml -n kube-system
+kubectl apply -f setup/flux -n kube-system
 ```

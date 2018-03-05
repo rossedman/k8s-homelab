@@ -1,0 +1,47 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: flux
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: flux
+    spec:
+      serviceAccount: flux
+      volumes:
+      - name: git-key
+        secret:
+          secretName: flux-git-deploy
+      containers:
+      - name: flux
+        # There are no ":latest" images for flux. Find the most recent
+        # release or image version at https://quay.io/weaveworks/flux
+        # and replace the tag here.
+        image: quay.io/weaveworks/flux:1.2.3
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3030 # informational
+        volumeMounts:
+        - name: git-key
+          mountPath: /etc/fluxd/ssh
+        args:
+
+        # if you deployed memcached in a different namespace to flux,
+        # or with a different service name, you can supply these
+        # following two arguments to tell fluxd how to connect to it.
+        # - --memcached-hostname=memcached.default.svc.cluster.local
+        # - --memcached-service=memcached
+
+        # replace (at least) the following URL
+        - --git-url=git@github.com:rossedman/k8s-homelab
+        - --git-branch=master
+        - --git-path=cluster/manifests
+        # include these next two to connect to an "upstream" service
+        # (e.g., Weave Cloud). The token is particular to the service.
+        # - --connect=wss://cloud.weave.works/api/flux
+        # - --token=abc123abc123abc123abc123

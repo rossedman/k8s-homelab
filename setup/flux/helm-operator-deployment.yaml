@@ -33,16 +33,12 @@
             secretName: flux-git-deploy
         containers:
         - name: helm-operator
-          # There are no ":latest" images for helm-operator. Find the most recent
-          # release or image version at https://quay.io/weaveworks/flux (both have the same latest tag)
-          # and replace the tag here.
           image: quay.io/weaveworks/helm-operator:alpha
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - name: git-key
             mountPath: /etc/fluxd/ssh
           args:
-          # replace (at least) the following URL
           - --git-url=git@github.com:rossedman/k8s-homelab
           - --git-branch=master
           - --git-charts-path=cluster/charts

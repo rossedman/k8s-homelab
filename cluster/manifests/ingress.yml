@@ -3,11 +3,11 @@
   kind: FluxHelmRelease
   metadata:
     name: ingress
-    namespace: default
+    namespace: ingress
     labels:
       chart: ingress
   spec:
     chartGitPath: ingress
     values:
-      - name: rbac.create
-        value: "false"
+    - name: rbac.create
+      value: "false"

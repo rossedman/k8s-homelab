@@ -1,28 +1,12 @@
-# k8s-nuc
+# k8s-homelab
 
-## Setup Helm
+This repo has all the instructions and configuration for my kubernetes homelab. This was built on 4 Intel NUCs and 1 Raspberry Pi, but could be built on any machines that can run the same software.
 
-```
-kubectl create -f ./setup/tiller-rbac.yaml && \
-  helm init --service-account tiller
-```
+This cluster uses Weave Flux to pull configuration directly from this repo and then syncs it. 
 
-## Configuring W/Helm
+This setup also uses Rook and the underlying SSDs to provision PVCs and block storage. The SSDs were 250GB and only 50GB was assigned to the OS, the rest was left empty so that Rook could provision storage volumes.
 
-### Add Incubator
+To setup this cluster follow these instructions:
 
-```
-helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com
-```
-
-### Installing Configuration
-```
-helm dependency build ./metrics
-helm install -n metrics --namespace metrics ./metrics
-```
-
-### Upgrading Deployment
-```
-helm dependency update ./metrics
-helm upgrade metrics ./metrics --namespace metrics
-```
+- [Cluster Setup](./docs/cluster-setup.md)
+- [HAProxy Setup](./docs/haproxy-setup.md)

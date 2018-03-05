@@ -1,4 +1,4 @@
-# ON ALL NODES
+## ON ALL NODES
 
 ### install docker
 
@@ -26,7 +26,7 @@ swapoff /dev/dm-1
 
 ---
   
-# ON MASTER NODES
+## ON MASTER NODES
 
 ### init cluster
 
@@ -61,7 +61,7 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documen
 
 ---
 
-# ON WORKER NODES
+## ON WORKER NODES
 
 ```
 kubeadm join --token $TOKEN 192.168.86.80:6443 --discovery-token-ca-cert-hash $HASH
@@ -69,7 +69,7 @@ kubeadm join --token $TOKEN 192.168.86.80:6443 --discovery-token-ca-cert-hash $H
 
 ---
 
-# SMOKE TEST
+## SMOKE TEST
 
 ```
 kubectl run guids --image=alexellis2/guid-service:latest --port 9000
@@ -78,7 +78,7 @@ kubectl get pods
 
 ---
 
-# SETUP
+## SETUP
 
 ```
 kubectl taint nodes --all node-role.kubernetes.io/master
@@ -86,4 +86,23 @@ kubectl label node/k8s-nuc1 kubernetes.io/role=worker
 kubectl label node/k8s-nuc2 kubernetes.io/role=worker
 kubectl label node/k8s-nuc3 kubernetes.io/role=worker
 helm init
+```
+
+---
+
+## STORAGE
+
+Install rook controllers and operators
+
+```
+helm repo add rook-master https://charts.rook.io/master
+helm install rook-master/rook --version v0.7.0-10.g3bcee98 --namespace rook -n rook
+```
+
+Setup rook cluster, storage class and agent permissions
+
+```
+kubectl apply -f storage/rook-cluster.yml
+kubectl apply -f storage/rook-storageclass.yml
+kubectl apply -f storage/rook-agent.yml
 ```

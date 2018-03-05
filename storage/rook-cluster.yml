@@ -1,0 +1,16 @@
+apiVersion: rook.io/v1alpha1
+kind: Cluster
+metadata:
+  name: rook
+  namespace: rook
+spec:
+  dataDirHostPath: /var/lib/rook
+  storage:
+    useAllNodes: true
+    useAllDevices: false
+    storeConfig:
+      deviceFilter:
+        - "sda3"
+      storeType: bluestore
+      databaseSizeMB: 1024
+      journalSizeMB: 1024

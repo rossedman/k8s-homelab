@@ -1,0 +1,15 @@
+---
+  apiVersion: helm.integrations.flux.weave.works/v1alpha
+  kind: FluxHelmRelease
+  metadata:
+    name: metrics
+    namespace: kube-system
+    labels:
+      chart: metrics
+  spec:
+    chartGitPath: metrics
+    values:
+      - name: heapster.rbac.create
+        value: true
+      - name: kube-state-metrics.rbac.create
+        value: true

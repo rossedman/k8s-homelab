@@ -1,0 +1,13 @@
+---
+  apiVersion: helm.integrations.flux.weave.works/v1alpha
+  kind: FluxHelmRelease
+  metadata:
+    name: ingress
+    namespace: default
+    labels:
+      chart: ingress
+  spec:
+    chartGitPath: ingress
+    values:
+      - name: rbac.create
+        value: false

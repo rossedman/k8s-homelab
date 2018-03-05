@@ -117,7 +117,19 @@ kubectl apply -f setup/storage/rook-agent.yml
 
 Setup flux and begin bootstrapping cluster configurations and deployments from git
 
+Setup memcache and flux RBAC
 ```
-kubectl apply -f setup/flux/flux-deployment.yml -n kube-system
-kubectl apply -f setup/flux -n kube-system
+kubectl apply -f setup/flux/memcache-dep.yaml,setup/flux/memcache-svc.yaml
+kubectl apply -f setup/flux/flux-account.yml
+```
+
+Install ssh key for flux
+```
+kubectl create secret generic flux-git-deploy --from-file=identity=$HOME/.ssh/id_rsa -n kube-system
+```
+
+Install flux and helm operator
+```
+kubectl apply -f setup/flux/flux-deployment.yaml
+kubectl apply -f setup/flux/helm-operator-deployment.yaml
 ```

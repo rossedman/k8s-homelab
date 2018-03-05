@@ -78,7 +78,7 @@ kubectl get pods
 
 ---
 
-## SETUP
+## SETUP NODES & TILLER
 
 ```
 kubectl taint nodes --all node-role.kubernetes.io/master
@@ -102,7 +102,7 @@ helm install rook-master/rook --version v0.7.0-10.g3bcee98 --namespace rook -n r
 Setup rook cluster, storage class and agent permissions
 
 ```
-kubectl apply -f storage/rook-cluster.yml
-kubectl apply -f storage/rook-storageclass.yml
-kubectl apply -f storage/rook-agent.yml
+kubectl apply -f setup/storage/rook-cluster.yml
+kubectl apply -f setup/storage/rook-storageclass.yml
+kubectl apply -f setup/storage/rook-agent.yml
 ```

@@ -1,7 +1,7 @@
 ## ON ALL NODES
 
 ### install docker
-
+login as root which is `sudo su`
 ```
 apt-get update && apt-get install -qy docker.io
 ```
@@ -18,13 +18,11 @@ apt-get update && apt-get install -y kubelet kubeadm kubernetes-cni
 ```
 
 ### disable swap
-
 ```
-cat /proc/swaps
-swapoff /dev/dm-1
-vim /etc/fstab --> comment out the swap or swap will start again upon restart
+cat /proc/swaps - (this lets you view if any swaps are enabled)
+swapoff -a - (this turns off all the swaps in your session)
+vim /etc/fstab - (you will need to comment/delete the swap)
 ```
-
 ---
 
 ## ON MASTER NODES
@@ -36,14 +34,15 @@ kubeadm init \
   --pod-network-cidr=10.244.0.0/16 \
   --apiserver-advertise-address=0.0.0.0 \
   --kubernetes-version stable-1.9 \
-  --service-dns-domain cool.haus
+  --service-dns-domain de.wae
 ```
-token: cb9554.766507458d900744
-192.168.2.241:6443
-HASH: sha256:61176f7438054a684cddd491d520ecb07c9cd8879314dd85066b4bf8bb6e30da
+**Record yo stuff**
+Token: $TOKEN
+IP ADDRESS: $IP ADDRESS:6443
+HASH: $SHA256-HASH
 
 ### install kubeconfig
-
+get out of root `ctrl + d`
 ```
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -53,16 +52,16 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ### from laptop copy config down
 
 ```
-scp redman@k8s-nuc4.lan:~/.kube/config .
+scp (server hostname):~/.kube/config .
 ```
 
-### install flannel
+### install flannel (Networking)
 
 ```
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/k8s-manifests/kube-flannel-rbac.yml
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
 ```
-### install Weave Net
+### install Weave Net (Networking)
 
 ```
 $ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
@@ -72,7 +71,7 @@ $ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl vers
 ## ON WORKER NODES
 
 ```
-kubeadm join --token $TOKEN 192.168.86.80:6443 --discovery-token-ca-cert-hash $HASH
+kubeadm join --token $TOKEN $IP_ADDRESS:6443 --discovery-token-ca-cert-hash $HASH
 ```
 
 ---
@@ -131,28 +130,8 @@ kubectl apply -f setup/storage/rook-agent.yml
 
 ---
 
-## FLUX
 
-Setup flux and begin bootstrapping cluster configurations and deployments from git
-
-Setup memcache and flux RBAC
-```
-kubectl apply -f setup/flux/memcache-dep.yaml,setup/flux/memcache-svc.yaml
-kubectl apply -f setup/flux/flux-account.yaml
-```
-
-Install ssh key for flux
-```
-kubectl create secret generic flux-git-deploy --from-file=identity=$HOME/.ssh/id_rsa -n kube-system
-```
-
-Install flux and helm operator
-```
-kubectl apply -f setup/flux/flux-deployment.yaml
-kubectl apply -f setup/flux/helm-operator-deployment.yaml
-```
-
-## RESSETING STUFF
+## RESETING STUFF
 ```
 kubeadm reset
 systemctl stop kubelet
@@ -167,17 +146,3 @@ ip link delete cni0
 ip link delete flannel.1
 ```
 Worst case just reinstall ubuntu LOL
-
-## IP Address STUFF
-
-```
-vim /etc/network/interfaces
-
-change inet auto to inet static
-address 192.168.2.241 & 242
-netmask 255.255.255.0
-gateway 192.168.2.254
-dns-nameservers 8.8.8.8 8.8.4.4
-
-sudo /etc/init.d/networking restart
-```

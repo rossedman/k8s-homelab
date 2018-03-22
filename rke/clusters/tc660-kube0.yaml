@@ -1,0 +1,182 @@
+nodes:
+  # control plane
+  - address: tc660-kube0-ctl1
+    user: nozomi
+    role: ["controlplane", "etcd"]
+    hostname_override: tc660-kube0-ctl1
+    labels:
+      node: ctl
+
+  # gpc - worker nodes
+  - address: tc660-kube0-gpc1
+    user: nozomi
+    role: ["worker"]
+    hostname_override: tc660-kube0-gpc1
+    labels:
+      node: gpc
+
+services:
+  kube-api:
+    service_cluster_ip_range: 10.244.0.0/16
+    pod_security_policy: false
+    extra_args:
+      v: 4
+  kube-controller:
+    cluster_cidr: 10.244.64.0/16
+    service_cluster_ip_range: 10.244.0.0/16
+  scheduler:
+  kubelet:
+    cluster_domain: cluster.local
+    cluster_dns_server: 10.244.0.3
+    infra_container_image: gcr.io/google_containers/pause-amd64:3.0
+  kubeproxy:
+  # kube-api:
+  #   service_cluster_ip_range: 172.18.192.0/18
+  #   extra_args:
+  #     cloud-config: /etc/kubernetes/azure.json
+  #     cloud-provider: azure
+  # kube-controller:
+  #   cluster_cidr: 172.18.128.0/18
+  #   service_cluster_ip_range: 172.18.192.0/18
+  #   extra_args:
+  #     cloud-config: /etc/kubernetes/azure.json
+  #     cloud-provider: azure
+  # kubelet:
+  #   cluster_domain: cluster.local
+  #   cluster_dns_server: 172.18.192.10
+  #   extra_args:
+  #     cloud-config: /etc/kubernetes/azure.json
+  #     cloud-provider: azure
+  # kube-proxy:
+  #   cluster_cidr: 172.18.128.0/18
+
+kubernetes_version: v1.8.7-rancher1-1
+
+ssh_key_path: ~/.ssh/id_rsa
+
+ignore_docker_version: true
+
+network:
+  plugin: weave
+
+ingress:
+  provider: nginx
+  node_selector:
+    node-pool: lbe
+
+addons: |-
+  ---
+  kind: Service
+  apiVersion: v1
+  metadata:
+    name: ingress-nginx
+    namespace: ingress-nginx
+  spec:
+    type: NodePort
+    ports:
+    - name: http
+      port: 80
+      targetPort: http
+      nodePort: 30080
+    - name: https
+      port: 443
+      targetPort: https
+      nodePort: 30443
+    selector:
+      app: ingress-nginx
+  ---
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: tiller
+    namespace: kube-system
+  ---
+  apiVersion: rbac.authorization.k8s.io/v1beta1
+  kind: ClusterRoleBinding
+  metadata:
+    name: tiller
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cluster-admin
+  subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
+  ---
+  apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: helmreleases.helm.bitnami.com
+  spec:
+    group: helm.bitnami.com
+    names:
+      kind: HelmRelease
+      listKind: HelmReleaseList
+      plural: helmreleases
+      singular: helmrelease
+    scope: Namespaced
+    version: v1
+  ---
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    labels:
+      app: helm
+      name: tiller
+    name: tiller-deploy
+    namespace: kube-system
+  spec:
+    strategy: {}
+    template:
+      metadata:
+        labels:
+          app: helm
+          name: tiller
+      spec:
+        serviceAccountName: tiller
+        containers:
+        - args:
+          - --listen=localhost:44134
+          command:
+          - /tiller
+          env:
+          - name: TILLER_NAMESPACE
+            value: kube-system
+          - name: TILLER_HISTORY_MAX
+            value: "0"
+          image: gcr.io/kubernetes-helm/tiller:v2.7.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 44135
+            initialDelaySeconds: 1
+            timeoutSeconds: 1
+          name: tiller
+          ports: []
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 44135
+            initialDelaySeconds: 1
+            timeoutSeconds: 1
+          resources: {}
+        - args:
+          - --home=/helm
+          - --host=localhost:44134
+          command:
+          - /controller
+          env:
+          - name: TMPDIR
+            value: /helm
+          image: bitnami/helm-crd-controller:latest
+          name: controller
+          securityContext:
+            readOnlyRootFilesystem: true
+          volumeMounts:
+          - mountPath: /helm
+            name: home
+        volumes:
+        - name: home
+          emptyDir: {}

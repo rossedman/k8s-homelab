@@ -1,7 +1,7 @@
 ## ON ALL NODES
 
 ### install docker
-
+login as root which is `sudo su`
 ```
 apt-get update && apt-get install -qy docker.io
 ```
@@ -16,16 +16,15 @@ echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.l
 
 apt-get update && apt-get install -y kubelet kubeadm kubernetes-cni
 ```
-  
+
 ### disable swap
-
 ```
-cat /proc/swaps
-swapoff /dev/dm-1
+cat /proc/swaps - (this lets you view if any swaps are enabled)
+swapoff -a - (this turns off all the swaps in your session)
+vim /etc/fstab - (you will need to comment/delete the swap)
 ```
-
 ---
-  
+
 ## ON MASTER NODES
 
 ### init cluster
@@ -35,11 +34,15 @@ kubeadm init \
   --pod-network-cidr=10.244.0.0/16 \
   --apiserver-advertise-address=0.0.0.0 \
   --kubernetes-version stable-1.9 \
-  --service-dns-domain cool.haus
+  --service-dns-domain de.wae
 ```
-  
-### install kubeconfig
+**Record yo stuff**
+Token: $TOKEN
+IP ADDRESS: $IP ADDRESS:6443
+HASH: $SHA256-HASH
 
+### install kubeconfig
+get out of root `ctrl + d`
 ```
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -49,22 +52,26 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ### from laptop copy config down
 
 ```
-scp redman@k8s-nuc4.lan:~/.kube/config .
+scp (server hostname):~/.kube/config .
 ```
-  
-### install flannel
+
+### install flannel (Networking)
 
 ```
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/k8s-manifests/kube-flannel-rbac.yml
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
 ```
+### install Weave Net (Networking)
 
+```
+$ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+```
 ---
 
 ## ON WORKER NODES
 
 ```
-kubeadm join --token $TOKEN 192.168.86.80:6443 --discovery-token-ca-cert-hash $HASH
+kubeadm join --token $TOKEN $IP_ADDRESS:6443 --discovery-token-ca-cert-hash $HASH
 ```
 
 ---
@@ -89,18 +96,28 @@ kubectl label node/k8s-nuc3 kubernetes.io/role=worker
 
 ```
 kubectl create -f ./setup/tiller-rbac.yaml && \
-  helm init --service-account tiller
+helm init --service-account tiller
 ```
 
 ---
 
 ## STORAGE
 
+Create service account for TILLER
+```
+kubectl create serviceaccount --namespace kube-system tiller
+kubectl create clusterrolebinding tiller --clusterole cluster-admin --serviceaccount=kube-system:tiller
+kubectl -n kube-system patch deploy/tiller-deploy -p '{"spec": {"template": {"spec": {"serviceAccountName": "tiller"}}}}'
+
+```
 Install rook controllers and operators
+
 
 ```
 helm repo add rook-master https://charts.rook.io/master
-helm install rook-master/rook --version v0.7.0-10.g3bcee98 --namespace rook -n rook
+helm search rook
+helm install rook-master/rook --version <LATEST VERSION> --namespace rook -n rook
+kubectl --namespace rook get pods -l app=rook-operator
 ```
 
 Setup rook cluster, storage class and agent permissions
@@ -113,23 +130,19 @@ kubectl apply -f setup/storage/rook-agent.yml
 
 ---
 
-## FLUX
 
-Setup flux and begin bootstrapping cluster configurations and deployments from git
-
-Setup memcache and flux RBAC
+## RESETING STUFF
 ```
-kubectl apply -f setup/flux/memcache-dep.yaml,setup/flux/memcache-svc.yaml
-kubectl apply -f setup/flux/flux-account.yml
+kubeadm reset
+systemctl stop kubelet
+systemctl stop docker
+rm -rf /var/lib/cni/
+rm -rf /var/lib/kubelet/*
+rm -rf /etc/cni/
+ifconfig cni0 down
+ifconfig flannel.1 down
+ifconfig docker0 down
+ip link delete cni0
+ip link delete flannel.1
 ```
-
-Install ssh key for flux
-```
-kubectl create secret generic flux-git-deploy --from-file=identity=$HOME/.ssh/id_rsa -n kube-system
-```
-
-Install flux and helm operator
-```
-kubectl apply -f setup/flux/flux-deployment.yaml
-kubectl apply -f setup/flux/helm-operator-deployment.yaml
-```
+Worst case just reinstall ubuntu LOL

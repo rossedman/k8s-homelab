@@ -1,0 +1,31 @@
+cluster_name: homelab
+kubernetes_version: v1.11.1-rancher1-1
+nodes:
+- address: k8s-nuc1.lan
+  user: redman
+  role:
+  - controlplane
+  - etcd
+- address: k8s-nuc2.lan
+  user: redman
+  role:
+  - worker
+  labels:
+    app: ingress
+- address: k8s-nuc3.lan
+  user: redman
+  role:
+  - worker
+  labels:
+    app: ingress
+- address: k8s-nuc4.lan
+  user: redman
+  role:
+  - worker
+  labels:
+    app: ingress
+ingress:
+    provider: nginx
+    node_selector:
+      app: ingress
+ssh_key_path: ~/.ssh/homelab

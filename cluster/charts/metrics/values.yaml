@@ -1,6 +1,0 @@
-heapster:
-  rbac:
-    create: true
-kube-state-metrics:
-  rbac:
-    create: true

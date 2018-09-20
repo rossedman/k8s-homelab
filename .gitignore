@@ -1,2 +1,2 @@
 config
-kube_config_cluster.yaml
+kube_config_cluster.yml

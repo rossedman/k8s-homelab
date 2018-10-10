@@ -23,7 +23,7 @@ data:
       omit_hostname = false
 
     [[outputs.influxdb]]
-      urls = ["http://influxdb.monitoring:8086"]
+      urls = ["http://influxdb.monitoring.svc.cluster.local:8086"]
       database = "influxdb"
       retention_policy = ""
       timeout = "5s"
@@ -45,6 +45,12 @@ data:
 
     [[inputs.mem]]
 
+    [[inputs.net]]
+
+    [[inputs.netstat]]
+
+    [[inputs.nstat]]
+
     [[inputs.processes]]
 
     [[inputs.system]]
@@ -60,6 +66,16 @@ data:
       url = "http://$HOSTIP:10255"
       bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       insecure_skip_verify = true
+
+    [[inputs.nats]]
+      server = "http://nats-mgmt.queue.svc.cluster.local:8222"
+
+    [[inputs.ping]]
+      interval = "60s"
+      urls = ["github.com", "google.com"]
+      count = 4
+      ping_interval = 1.0
+      timeout = 2.0
 
     [[inputs.statsd]]
       protocol = "udp"

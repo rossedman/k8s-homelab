@@ -14,35 +14,33 @@ spec:
     spec:
       containers:
       - name: grafana
+        env:
+        - name: GF_SERVER_HTTP_PORT
+          value: "3000"
         image: grafana/grafana:5.3.0
         ports:
         - containerPort: 3000
           protocol: TCP
         volumeMounts:
-        - mountPath: /etc/ssl/certs
-          name: ca-certificates
+        - name: ca-certificates
+          mountPath: /etc/ssl/certs
           readOnly: true
-        - mountPath: /var/lib/grafana
-          name: grafana-storage
-        env:
-        - name: GF_SERVER_HTTP_PORT
-          value: "3000"
-        - name: GF_AUTH_DISABLE_LOGIN_FORM
-          value: "true"
-        - name: GF_AUTH_DISABLE_SIGNOUT_MENU
-          value: "true"
-        - name: GF_AUTH_BASIC_ENABLED
-          value: "false"
-        - name: GF_AUTH_ANONYMOUS_ENABLED
-          value: "true"
-        - name: GF_AUTH_ANONYMOUS_ORG_ROLE
-          value: "Admin"
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+        - name: config-datasources
+          mountPath: /etc/grafana/provisioning/datasources
       volumes:
       - name: ca-certificates
         hostPath:
           path: /etc/ssl/certs
       - name: grafana-storage
         emptyDir: {}
+      - name: config-datasources
+        configMap:
+          name: grafana
+          items:
+            - key: datasource.yaml
+              path: datasource.yaml
 ---
 apiVersion: v1
 kind: Service
@@ -53,6 +51,7 @@ spec:
   ports:
   - port: 80
     targetPort: 3000
+    nodePort: 30333
   type: NodePort
   selector:
     app: grafana

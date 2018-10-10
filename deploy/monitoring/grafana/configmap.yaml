@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app: grafana
+data:
+  # inserted at provisioning/datasources to automatically
+  # bootstrap influxdb as primary datasource
+  datasource.yaml: |+
+    apiVersion: 1
+    datasources:
+    - name: influxdb
+      type: influxdb 
+      access: direct
+      url: http://influxdb:8086
+      database: influxdb
+      isDefault: true
+      version: 1
+      editable: false

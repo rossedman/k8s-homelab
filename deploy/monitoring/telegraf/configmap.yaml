@@ -31,7 +31,24 @@ data:
       password = ""
       user_agent = "telegraf"
       insecure_skip_verify = true
+
+    [[inputs.cpu]]
+      percpu = true
+      totalcpu = true
+      collect_cpu_time = false
+      report_active = false
+
+    [[inputs.disk]]
+      ignore_fs = ["tmpfs", "devtmpfs", "devfs", "overlay", "aufs", "squashfs"]
     
+    [[inputs.kernel]]
+
+    [[inputs.mem]]
+
+    [[inputs.processes]]
+
+    [[inputs.system]]
+
     [[inputs.docker]]
       endpoint = "unix://var/run/docker.sock"
       timeout = "5s"

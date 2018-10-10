@@ -6,6 +6,7 @@ nodes:
   role:
   - controlplane
   - etcd
+  - worker
 - address: k8s-nuc2.lan
   user: redman
   role:
@@ -25,7 +26,12 @@ nodes:
   labels:
     app: ingress
 ingress:
-    provider: nginx
-    node_selector:
-      app: ingress
+  provider: nginx
+  node_selector:
+    app: ingress
+services:
+  kubelet:
+    extra_args:
+      read-only-port: 10255
+      cadvisor-port: 4194
 ssh_key_path: ~/.ssh/homelab

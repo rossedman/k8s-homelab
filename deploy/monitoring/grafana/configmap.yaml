@@ -13,7 +13,7 @@ data:
     datasources:
     - name: influxdb
       type: influxdb 
-      access: direct
+      access: proxy
       url: http://influxdb:8086
       database: influxdb
       isDefault: true

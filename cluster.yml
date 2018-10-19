@@ -30,6 +30,9 @@ ingress:
   node_selector:
     app: ingress
 services:
+  kube-api:
+    extra_args:
+      admission-control: Initializers,ServiceAccount,NamespaceLifecycle,LimitRanger,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds
   kubelet:
     extra_args:
       read-only-port: 10255

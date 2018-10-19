@@ -13,12 +13,12 @@ nodes:
   - worker
   labels:
     app: ingress
-- address: k8s-nuc3.lan
-  user: redman
-  role:
-  - worker
-  labels:
-    app: ingress
+# - address: k8s-nuc3.lan
+#   user: redman
+#   role:
+#   - worker
+#   labels:
+#     app: ingress
 - address: k8s-nuc4.lan
   user: redman
   role:
@@ -32,9 +32,21 @@ ingress:
 services:
   kube-api:
     extra_args:
-      admission-control: Initializers,ServiceAccount,NamespaceLifecycle,LimitRanger,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds
+      admission-control: ServiceAccount,NamespaceLifecycle,LimitRanger,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds,Initializers
+      feature-gates: Initializers=true
+      runtime-config: admissionregistration.k8s.io/v1alpha1
+  kube-controller-manager:
+    extra_args:
+      feature-gates: Initializers=true
+  kube-proxy:
+    extra_args:
+      feature-gates: Initializers=true
+  kube-scheduler:
+    extra_args:
+      feature-gates: Initializers=true
   kubelet:
     extra_args:
+      feature-gates: Initializers=true
       read-only-port: 10255
       cadvisor-port: 4194
 ssh_key_path: ~/.ssh/homelab

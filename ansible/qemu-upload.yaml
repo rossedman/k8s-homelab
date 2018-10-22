@@ -1,0 +1,3 @@
+---
+- hosts: metal
+  gather_facts: true

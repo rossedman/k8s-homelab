@@ -1,26 +1,26 @@
 cluster_name: homelab
-kubernetes_version: v1.11.1-rancher1-1
+kubernetes_version: v1.12.0-rancher1-1
 nodes:
-- address: k8s-nuc1.lan
-  user: redman
+- address: octo3.lan
+  user: rossedman
   role:
   - controlplane
   - etcd
   - worker
-- address: k8s-nuc2.lan
-  user: redman
+- address: octo4.lan
+  user: rossedman
   role:
   - worker
   labels:
     app: ingress
-# - address: k8s-nuc3.lan
-#   user: redman
-#   role:
-#   - worker
-#   labels:
-#     app: ingress
-- address: k8s-nuc4.lan
-  user: redman
+- address: octo5.lan
+  user: rossedman
+  role:
+  - worker
+  labels:
+    app: ingress
+- address: octo6.lan
+  user: rossedman
   role:
   - worker
   labels:
@@ -30,23 +30,25 @@ ingress:
   node_selector:
     app: ingress
 services:
-  kube-api:
-    extra_args:
-      admission-control: ServiceAccount,NamespaceLifecycle,LimitRanger,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds,Initializers
-      feature-gates: Initializers=true
-      runtime-config: admissionregistration.k8s.io/v1alpha1
-  kube-controller-manager:
-    extra_args:
-      feature-gates: Initializers=true
-  kube-proxy:
-    extra_args:
-      feature-gates: Initializers=true
-  kube-scheduler:
-    extra_args:
-      feature-gates: Initializers=true
+  # kube-api:
+  #   extra_args:
+  #     admission-control: ServiceAccount,NamespaceLifecycle,LimitRanger,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds,Initializers
+  #     feature-gates: Initializers=true
+  #     runtime-config: admissionregistration.k8s.io/v1alpha1
+  # kube-controller-manager:
+  #   extra_args:
+  #     feature-gates: Initializers=true
+  # kube-proxy:
+  #   extra_args:
+  #     feature-gates: Initializers=true
+  # kube-scheduler:
+  #   extra_args:
+  #     feature-gates: Initializers=true
   kubelet:
     extra_args:
-      feature-gates: Initializers=true
+      #feature-gates: Initializers=true
       read-only-port: 10255
       cadvisor-port: 4194
-ssh_key_path: ~/.ssh/homelab
+ignore_docker_version: true
+ssh_agent_auth: true
+ssh_key_path: ~/.ssh/id_rsa

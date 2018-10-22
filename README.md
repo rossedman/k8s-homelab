@@ -8,5 +8,6 @@ This setup also uses Rook and the underlying SSDs to provision PVCs and block st
 
 To setup this cluster follow these instructions:
 
+- [Metal Setup](./docs/metal-setup.md)
 - [Cluster Setup](./docs/cluster-setup.md)
 - [HAProxy Setup](./docs/haproxy-setup.md)

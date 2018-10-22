@@ -1,0 +1,84 @@
+---
+- hosts: metal
+  gather_facts: true
+  vars:
+    packages:
+      - apt-transport-https 
+      - bridge-utils
+      - ca-certificates 
+      - cockpit
+      - cockpit-docker
+      - cockpit-machines
+      - chrony
+      - curl 
+      - software-properties-common
+      - docker-ce
+      - qemu
+      - qemu-kvm
+      - libvirt-bin
+      - libvirt-clients 
+      - libvirt-daemon-system
+  tasks:
+    - name: set timezone
+      become: true
+      timezone:
+        name: America/Chicago
+
+    - name: Add all main repositories
+      become: true
+      apt_repository:
+        repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} main universe restricted stable multiverse"
+
+    - name: Remove old docker packages
+      become: true
+      apt: name="{{ item }}" state=absent
+      loop:
+        - docker 
+        - docker-engine 
+        - docker.io
+
+    - name: Add docker repo
+      become: true
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+
+    - name: Add docker repo key
+      become: true
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Update packages
+      become: true
+      apt:
+        update_cache: yes
+
+    - name: Install packages
+      become: true
+      apt: name="{{ item }}"
+      loop: "{{ packages }}"
+
+    - name: Ensure chrony is running
+      become: true
+      service: name=chrony enabled=yes state=restarted
+
+    - name: Ensure cockpit is running
+      become: true
+      service: name=cockpit enabled=yes
+
+    - name: Create docker group
+      become: true
+      group: name=docker state=present
+
+    - name: Add user to docker group
+      become: true
+      user: name=rossedman groups=docker append=yes
+
+  handlers:
+    - name: restart cockpit 
+      service: name=cockpit state=restarted
+      listen: "restart services"
+
+    - name: restart docker
+      service: name=docker state=restarted
+      listen: "restart services"

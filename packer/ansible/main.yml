@@ -1,0 +1,42 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: yes
+  vars:
+    default_users: [rossedman]
+    default_packages: [curl, git, wget, vim]
+    docker_edition: 'ce'
+    docker_package: "docker-{{ docker_edition }}=17.03.2"
+    docker_package_state: present
+    docker_service_state: started
+    docker_service_enabled: true
+    docker_users: "{{ default_users }}"
+    pip_install_packages:
+      - name: docker
+  roles:
+    - geerlingguy.pip
+    - geerlingguy.docker
+  tasks:
+    # install sane defaults
+    - apt: "name={{ item }} state=installed"
+      loop: "{{ default_packages }}"
+    
+    # user creation
+    - user:
+        name: "{{ item }}"
+        groups:
+          - sudo
+        state: present
+      loop: "{{ default_users }}"
+
+    - file:
+        path: "/home/{{ item }}/.ssh"
+        state: directory
+        mode: 0700
+      loop: "{{ default_users }}"
+
+    - get_url:
+        url: "https://github.com/{{item}}.keys"
+        dest: "/home/{{item}}/.ssh/authorized_keys"
+        mode: 0600
+      loop: "{{ default_users }}"

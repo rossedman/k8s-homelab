@@ -1,0 +1,46 @@
+---
+- hosts: metal
+  gather_facts: true
+  vars:
+    docker_users: [rossedman]
+    packages:
+      - apt-transport-https 
+      - bridge-utils
+      - ca-certificates 
+      - cockpit
+      - cockpit-docker
+      - cockpit-machines
+      - chrony
+      - curl 
+      - software-properties-common
+      - docker-ce
+      - qemu
+      - qemu-kvm
+      - libvirt-bin
+      - libvirt-clients 
+      - libvirt-daemon-system
+  tasks:
+    - import_tasks: tasks/base.yml
+
+    - import_tasks: tasks/packages.yml packages="{{ packages }}"
+      notify: [start cockpit, start chrony]
+
+    - import_tasks: tasks/docker.yml docker_users="{{ docker_users }}"
+      notify: [restart docker]
+
+  handlers:
+    - name: start chrony
+      become: true
+      service: name=chrony enabled=yes state=running
+
+    - name: start cockpit
+      become: true
+      service: name=cockpit enabled=yes state=running
+
+    - name: restart cockpit 
+      service: name=cockpit enabled=yes state=restarted
+      listen: "restart services"
+
+    - name: restart docker
+      service: name=docker enabled=yes state=restarted
+      listen: "restart services"

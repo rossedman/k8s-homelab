@@ -1,0 +1,16 @@
+---
+- name: add all main repositories
+  become: true
+  apt_repository:
+    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} main universe restricted stable multiverse"
+
+- name: update packages
+  become: true
+  apt:
+    update_cache: yes
+
+- name: install packages
+  become: true
+  apt: 
+    name: "{{ item }}"
+  loop: "{{ packages }}"

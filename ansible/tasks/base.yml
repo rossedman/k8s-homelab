@@ -1,0 +1,5 @@
+---
+- name: set timezone
+  become: true
+  timezone:
+    name: America/Chicago

@@ -1,0 +1,36 @@
+---
+- name: remove old docker packages
+  become: true
+  apt: 
+    name: "{{ item }}" 
+    state: absent
+  loop:
+    - docker 
+    - docker-engine 
+    - docker.io
+
+- name: add docker repo
+  become: true
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+
+- name: add docker repo key
+  become: true
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: create docker group
+  become: true
+  group: 
+    name: docker 
+    state: present
+
+- name: add users to docker group
+  become: true
+  user: 
+    name: "{{ item }}"
+    groups: docker 
+    append: yes
+  loop: "{{ docker_users }}"
+  

@@ -21,9 +21,18 @@ Once this has been completed we run our Ansible against our bare metal hosts
 cd ansible && ansible-playbook --diff bare-metal.yaml
 ```
 
+Here are some helpful commands for debugging and finding information
+
+```
+# view all facts about host
+ansible -m setup octo1.lan -i hosts
+```
+
 ---
 
 ### Base Image
+
+There is a base image for running VMs that is similar to the metal servers themselves. This is built to work locally as well as run denser workloads on the metal servers for easy practice.
 
 Ensure that QEMU is installed so we can build on Mac
 
@@ -35,10 +44,4 @@ Then build the images for Virtualbox and QEMU!
 
 ```
 cd packer && packer build -only=qemu base.json
-```
-
-When completed, upload the QEMU images to the baremetal boxes
-
-```
-cd ansible && ansible-playbook --diff qemu-upload.yaml
 ```

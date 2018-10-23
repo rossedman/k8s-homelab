@@ -1,0 +1,53 @@
+---
+- hosts: [nfs_server, nfs_clients]
+  become: true
+  vars:
+    nfs_exports: ["/data/k8s/pvc"]
+  handlers:
+    - name: reload nfs
+      #command: 'exportfs -ra'
+      service:
+        name: nfs-kernel-server
+        state: restarted
+  tasks:
+    - name: ensure nfs is installed
+      apt: name=nfs-kernel-server state=present update_cache=yes
+      when: "'nfs_server' in group_names"
+
+    - name: ensure nfs common is installed.
+      apt: name=nfs-common state=present update_cache=yes
+      when: "'nfs_clients' in group_names"
+  
+    - file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0700
+        owner: nobody
+        group: nogroup
+      with_items: "{{ nfs_exports }}"
+
+    - name: copy exports file.
+      template:
+        src: exports.j2
+        dest: /etc/exports
+        owner: root
+        group: root
+        mode: 0644
+      notify: reload nfs
+      when: "'nfs_server' in group_names"
+
+    - name: set mountpoints
+      mount: 
+        name: "{{ item }}"
+        src: "{{ hostvars[groups['nfs_server'][0]]['ansible_default_ipv4']['address'] }}:{{ item }}" 
+        fstype: nfs 
+        # opts: defaults,nobootwait 
+        # dump: 0 
+        # passno: 2 
+        state: mounted
+      with_items: "{{ nfs_exports }}"
+      when: "'nfs_clients' in group_names"
+
+    - name: Ensure nfs is running.
+      service: name=nfs-kernel-server state=started enabled=yes
+      when: "'nfs_server' in group_names"

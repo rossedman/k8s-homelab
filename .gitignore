@@ -1,4 +1,5 @@
 config
 kube_config_cluster.yml
+ansible/facts
 packer_cache
 packer/homelab-*

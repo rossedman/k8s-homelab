@@ -1,2 +1,8 @@
 [metal]
 octo[1:6].lan
+
+[nfs_server]
+octo1.lan
+
+[nfs_clients]
+octo[2:6].lan

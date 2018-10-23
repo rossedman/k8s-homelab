@@ -6,7 +6,6 @@
     default_users: [rossedman]
     default_packages: [curl, git, wget, vim, cockpit, cockpit-docker]
     docker_group_members: [rossedman]
-    #docker_pkg_name: 17.03.2~ce-0~ubuntu-xenial
   roles:
     - angstwad.docker_ubuntu
   tasks:

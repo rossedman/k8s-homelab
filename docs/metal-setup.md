@@ -18,7 +18,9 @@ rossedman ALL=(ALL) NOPASSWD: ALL
 Once this has been completed we run our Ansible against our bare metal hosts
 
 ```
-cd ansible && ansible-playbook --diff bare-metal.yaml
+cd ansible
+ansible-playbook --diff metal.yaml
+ansible-playbook --diff nfs.yaml
 ```
 
 Here are some helpful commands for debugging and finding information

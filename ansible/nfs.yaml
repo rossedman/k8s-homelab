@@ -5,7 +5,6 @@
     nfs_exports: ["/data/k8s/pvc"]
   handlers:
     - name: reload nfs
-      #command: 'exportfs -ra'
       service:
         name: nfs-kernel-server
         state: restarted
@@ -41,9 +40,6 @@
         name: "{{ item }}"
         src: "{{ hostvars[groups['nfs_server'][0]]['ansible_default_ipv4']['address'] }}:{{ item }}" 
         fstype: nfs 
-        # opts: defaults,nobootwait 
-        # dump: 0 
-        # passno: 2 
         state: mounted
       with_items: "{{ nfs_exports }}"
       when: "'nfs_clients' in group_names"

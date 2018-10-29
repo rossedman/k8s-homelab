@@ -13,4 +13,5 @@
   become: true
   apt: 
     name: "{{ item }}"
+    autoremove: yes
   loop: "{{ packages }}"

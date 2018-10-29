@@ -13,12 +13,12 @@
       - chrony
       - curl 
       - software-properties-common
-      - docker-ce
-      - qemu
-      - qemu-kvm
-      - libvirt-bin
-      - libvirt-clients 
-      - libvirt-daemon-system
+      # - qemu
+      # - qemu-kvm
+      # - libvirt-bin
+      # - libvirt-clients 
+      # - libvirt-daemon-system
+
   tasks:
     - import_tasks: tasks/base.yml
 

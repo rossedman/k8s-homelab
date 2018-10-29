@@ -3,3 +3,17 @@
   become: true
   timezone:
     name: America/Chicago
+
+- name: update sshd_config
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication=yes'
+    line: 'PasswordAuthentication=no'
+
+- name: restart sshd
+  become: true
+  service: 
+    name: sshd 
+    enabled: yes 
+    state: restarted

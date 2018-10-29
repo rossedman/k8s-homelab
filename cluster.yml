@@ -1,12 +1,24 @@
 cluster_name: homelab
 kubernetes_version: v1.12.0-rancher1-1
 nodes:
-- address: octo3.lan
+- address: octo1.lan
   user: rossedman
   role:
   - controlplane
   - etcd
   - worker
+- address: octo2.lan
+  user: rossedman
+  role:
+  - worker
+  labels:
+    app: ingress
+- address: octo3.lan
+  user: rossedman
+  role:
+  - worker
+  labels:
+    app: ingress
 - address: octo4.lan
   user: rossedman
   role:
@@ -30,23 +42,8 @@ ingress:
   node_selector:
     app: ingress
 services:
-  # kube-api:
-  #   extra_args:
-  #     admission-control: ServiceAccount,NamespaceLifecycle,LimitRanger,PersistentVolumeLabel,DefaultStorageClass,ResourceQuota,DefaultTolerationSeconds,Initializers
-  #     feature-gates: Initializers=true
-  #     runtime-config: admissionregistration.k8s.io/v1alpha1
-  # kube-controller-manager:
-  #   extra_args:
-  #     feature-gates: Initializers=true
-  # kube-proxy:
-  #   extra_args:
-  #     feature-gates: Initializers=true
-  # kube-scheduler:
-  #   extra_args:
-  #     feature-gates: Initializers=true
   kubelet:
     extra_args:
-      #feature-gates: Initializers=true
       read-only-port: 10255
       cadvisor-port: 4194
 ignore_docker_version: true

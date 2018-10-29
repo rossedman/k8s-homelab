@@ -12,13 +12,21 @@
 - name: add docker repo
   become: true
   apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
 
 - name: add docker repo key
   become: true
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
+
+- name: install docker
+  become: true
+  apt: 
+    name: "docker-ce=17.03.3~ce-0~ubuntu-xenial"
+    update_cache: yes
+    autoremove: yes
+    force: yes
 
 - name: create docker group
   become: true
@@ -33,4 +41,10 @@
     groups: docker 
     append: yes
   loop: "{{ docker_users }}"
+
+- name: start docker
+  service: 
+    name: docker 
+    enabled: yes 
+    state: started
   

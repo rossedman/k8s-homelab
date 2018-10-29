@@ -1,0 +1,25 @@
+---
+- name: add kube repo key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: add kube repo
+  apt_repository:
+    repo: "deb http://apt.kubernetes.io/ kubernetes-{{ ansible_distribution_release }} main"
+
+- name: install kube components
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+  loop: [kubeadm, kubelet]
+
+- name: remove swapfile from /etc/fstab
+  mount:
+    name: swap
+    fstype: swap
+    state: absent
+
+- name: disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0

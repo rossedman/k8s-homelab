@@ -6,3 +6,9 @@ octo1.lan
 
 [nfs_clients]
 octo[2:6].lan
+
+[kube_master]
+octo3.lan
+
+[kube_workers]
+octo[4:6].lan

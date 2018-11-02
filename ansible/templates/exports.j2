@@ -9,5 +9,5 @@
 # /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)
 #
 {% for export in nfs_exports %}
-{{ export }}    {% for host in groups['nfs_clients'] %}{{ hostvars[host]['ansible_facts']['default_ipv4']['address'] }}(rw,sync,no_subtree_check) {% endfor %}
+{{ export }}    {% for host in groups['nfs_clients'] %}{{ hostvars[host]['ansible_facts']['default_ipv4']['address'] }}(rw,sync,no_subtree_check) {% endfor %} 127.0.0.1(rw,sync,no_subtree_check)
 {% endfor %}

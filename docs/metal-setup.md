@@ -30,4 +30,7 @@ Here are some helpful commands for debugging and finding information
 ```
 # view all facts about host
 ansible -m setup octo1.lan -i hosts
+
+# ensure all hosts can be accessed
+ansible -m ping all -i hosts
 ```

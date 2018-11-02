@@ -13,11 +13,14 @@
       - chrony
       - curl 
       - software-properties-common
-      # - qemu
-      # - qemu-kvm
-      # - libvirt-bin
-      # - libvirt-clients 
-      # - libvirt-daemon-system
+
+  pre_tasks:
+    - name: install Python if not already present.
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      changed_when: False
+
+    - name: gather facts after Python is definitely present.
+      setup:
 
   tasks:
     - import_tasks: tasks/base.yml

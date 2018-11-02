@@ -15,3 +15,9 @@
     name: "{{ item }}"
     autoremove: yes
   loop: "{{ packages }}"
+
+- name: remove packages
+  become: true
+  apt:
+    name: ubuntu-fan
+    state: absent

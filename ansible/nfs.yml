@@ -2,7 +2,19 @@
 - hosts: [nfs_server, nfs_clients]
   become: true
   vars:
-    nfs_exports: ["/data/k8s/pvc"]
+    nfs_exports:
+    - /data/k8s/elasticsearch
+    - /data/k8s/influxdb
+    - /data/k8s/grafana
+    - /data/k8s/nats
+
+  pre_tasks:
+    - name: install Python if not already present.
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      changed_when: False
+
+    - name: gather facts after Python is definitely present.
+      setup:
 
   tasks:
     - name: ensure nfs is installed
@@ -12,7 +24,7 @@
     - name: ensure nfs common is installed.
       apt: name=nfs-common state=present update_cache=yes
       when: "'nfs_clients' in group_names"
-  
+
     - file:
         path: "{{ item }}"
         state: directory

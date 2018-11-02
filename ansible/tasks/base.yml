@@ -4,12 +4,12 @@
   timezone:
     name: America/Chicago
 
-- name: update sshd_config
-  become: true
-  lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: '^PasswordAuthentication=yes'
-    line: 'PasswordAuthentication=no'
+# - name: update sshd_config
+#   become: true
+#   lineinfile:
+#     path: /etc/ssh/sshd_config
+#     regexp: '^PasswordAuthentication=yes'
+#     line: 'PasswordAuthentication=no'
 
 - name: restart sshd
   become: true
@@ -17,3 +17,10 @@
     name: sshd 
     enabled: yes 
     state: restarted
+
+- name: stop app armor
+  become: true
+  service:
+    name: apparmor
+    enabled: no
+    state: stopped
